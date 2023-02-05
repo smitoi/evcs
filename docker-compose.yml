@@ -1,0 +1,84 @@
+version: '3'
+services:
+    php-fpm:
+        container_name: php-fpm
+        build:
+            context: .
+            dockerfile: docker/php-fpm/Dockerfile
+        restart: unless-stopped
+        volumes:
+            - ./:/srv/www
+        networks:
+            - evcs
+    nginx:
+        image: nginx
+        restart: unless-stopped
+        volumes:
+            - ./:/srv/www
+            - ./docker/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+        ports:
+            - "${NGINX_PORT:-80}:80"
+        environment:
+            - NGINX_PORT=80
+        networks:
+            - evcs
+        depends_on:
+            - php-fpm
+    pgsql:
+        image: 'postgres:15'
+        ports:
+            - '${FORWARD_DB_PORT:-5432}:5432'
+        environment:
+            PGPASSWORD: '${DB_PASSWORD:-secret}'
+            POSTGRES_DB: '${DB_DATABASE}'
+            POSTGRES_USER: '${DB_USERNAME}'
+            POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
+        volumes:
+            - 'evcs-pgsql:/var/lib/postgresql/data'
+        networks:
+            - evcs
+        healthcheck:
+            test: [ "CMD", "pg_isready", "-q", "-d", "${DB_DATABASE}", "-U", "${DB_USERNAME}" ]
+            retries: 3
+            timeout: 5s
+    redis:
+        image: 'redis:alpine'
+        ports:
+            - '${FORWARD_REDIS_PORT:-6379}:6379'
+        volumes:
+            - 'evcs-redis:/data'
+        networks:
+            - evcs
+        healthcheck:
+            test: [ "CMD", "redis-cli", "ping" ]
+            retries: 3
+            timeout: 5s
+    meilisearch:
+        image: 'getmeili/meilisearch:latest'
+        ports:
+            - '${FORWARD_MEILISEARCH_PORT:-7700}:7700'
+        volumes:
+            - 'evcs-meilisearch:/meili_data'
+        networks:
+            - evcs
+        healthcheck:
+            test: [ "CMD", "wget", "--no-verbose", "--spider",  "http://localhost:7700/health" ]
+            retries: 3
+            timeout: 5s
+    mailpit:
+        image: 'axllent/mailpit:latest'
+        ports:
+            - '${FORWARD_MAILPIT_PORT:-1025}:1025'
+            - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
+        networks:
+            - evcs
+networks:
+    evcs:
+        driver: bridge
+volumes:
+    evcs-pgsql:
+        driver: local
+    evcs-redis:
+        driver: local
+    evcs-meilisearch:
+        driver: local
