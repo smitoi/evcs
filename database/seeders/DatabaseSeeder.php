@@ -2,8 +2,11 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Enums\RoleEnum;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,13 +15,18 @@ class DatabaseSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
+        /** @var User $user */
+        $user = User::query()->create([
+            'name' => 'Administrator',
+            'email' => 'admin@mitstefan.dev',
+            'email_verified_at' => Carbon::now(),
+            'password' => bcrypt('password'),
+        ]);
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        $user->assignRole(
+            Role::findOrCreate(RoleEnum::ADMIN->value)
+        );
     }
 }

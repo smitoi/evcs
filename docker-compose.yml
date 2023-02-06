@@ -5,6 +5,9 @@ services:
         build:
             context: .
             dockerfile: docker/php-fpm/Dockerfile
+            args:
+                - UID=${UID:-1000}
+                - GID=${GID:-1000}
         restart: unless-stopped
         volumes:
             - ./:/srv/www

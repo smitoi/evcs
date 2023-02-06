@@ -10,7 +10,6 @@ up:
 	docker-compose exec php-fpm php artisan migrate
 	docker-compose exec php-fpm php artisan optimize
 	docker-compose exec php-fpm php artisan l5-swagger:generate
-	docker-compose exec php-fpm npm run dev
 
 stop:
 	docker-compose stop
