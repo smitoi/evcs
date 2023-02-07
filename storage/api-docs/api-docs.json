@@ -204,9 +204,41 @@
                 "summary": "List all stations",
                 "description": "List",
                 "operationId": "stationList",
+                "parameters": [
+                    {
+                        "name": "lat",
+                        "in": "query",
+                        "description": "Longitude of the user",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        },
+                        "example": "42.27"
+                    },
+                    {
+                        "name": "long",
+                        "in": "query",
+                        "description": "Latitude of the user",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        },
+                        "example": "27.42"
+                    },
+                    {
+                        "name": "max_distance",
+                        "in": "query",
+                        "description": "Maximum distance of the stations",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        },
+                        "example": "3.14"
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "Success with the stations",
+                        "description": "Success with the stations as a paginated resource",
                         "content": {
                             "application/json": {
                                 "schema": {

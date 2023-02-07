@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\DB;
 
 class CompanyController extends ApiController
 {
+    public const PER_PAGE = 10;
+
     /**
      * @OA\Get(
      *     path="/api/company/",
@@ -39,7 +41,7 @@ class CompanyController extends ApiController
 
         return $this->jsonSuccess(
             data: CompanyResource::collection(
-                Company::all(),
+                Company::paginate(self::PER_PAGE),
             ),
         );
     }
@@ -123,6 +125,8 @@ class CompanyController extends ApiController
     public function show(Company $company): JsonResponse
     {
         $this->authorize('view', $company);
+
+        $company->load('ancestors', 'descendants');
 
         return $this->jsonSuccess(
             data: CompanyResource::make($company),

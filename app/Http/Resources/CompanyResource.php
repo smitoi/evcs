@@ -38,7 +38,12 @@ class CompanyResource extends JsonResource
         return [
             'uuid' => $this->uuid,
             'name' => $this->name,
-            'parent_uuid' => $this->parent?->uuid,
+            'parent' => [
+                'name' => $this->parent?->name,
+                'uuid' => $this->parent?->uuid,
+            ],
+            'ancestors' => $this->whenLoaded('ancestors', self::collection($this->ancestors)),
+            'descendants' => $this->whenLoaded('descendants', self::collection($this->descendants))
         ];
     }
 }

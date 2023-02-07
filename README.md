@@ -1,11 +1,11 @@
 # EVCS Management System
 
-REST API for an electric vehicle charging station management system using Laravel 9. Main requirements:
+REST API for an electric vehicle charging station management system using Laravel 9. Due to the minimal requirements, I kept a small number - for a bigger application the whole logic present in the controllers would have been isolated in services / repositories, with DTOs for passing data around.
 
 - [x] Administrators can manage companies.
 - [x] Administrators can manage charging stations.
 - [x] Companies are arranged in a hierarchical structure.
-- [ ] Users can search the nearest stations to their position.
+- [x] Users can search the nearest stations to their position.
 
 ## Local Development
 

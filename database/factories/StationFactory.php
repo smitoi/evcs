@@ -21,8 +21,8 @@ class StationFactory extends Factory
         return [
             'name' => $this->faker->name,
             'address' => $this->faker->address,
-            'latitude' => $this->faker->randomFloat(),
-            'longitude' => $this->faker->randomFloat(),
+            'latitude' => $this->faker->randomFloat(min: -90, max: 90),
+            'longitude' => $this->faker->randomFloat(min: -180, max: 180),
             'company_id' => $this->faker->randomElement(Company::all())->id,
         ];
     }

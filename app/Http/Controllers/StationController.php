@@ -10,11 +10,15 @@ use App\Models\Station;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Meilisearch\Endpoints\Indexes;
 
 class StationController extends ApiController
 {
+    public const PER_PAGE = 10;
+
     /**
      * @OA\Get(
      *     path="/api/station/",
@@ -23,23 +27,83 @@ class StationController extends ApiController
      *     description="List",
      *     summary="List all stations",
      *     operationId="stationList",
+     *     @OA\Parameter(
+     *        description="Longitude of the user",
+     *        name="lat",
+     *        in="query",
+     *        required=false,
+     *        example="42.27",
+     *          @OA\Schema(
+     *              type="number",
+     *          )
+     *     ),
+     *     @OA\Parameter(
+     *        description="Latitude of the user",
+     *        name="long",
+     *        in="query",
+     *        required=false,
+     *        example="27.42",
+     *          @OA\Schema(
+     *              type="number",
+     *          )
+     *     ),
+     *     @OA\Parameter(
+     *        description="Maximum distance of the stations",
+     *        name="max_distance",
+     *        in="query",
+     *        required=false,
+     *        example="3.14",
+     *          @OA\Schema(
+     *              type="number",
+     *          )
+     *     ),
      *     @OA\Response(
      *         response="200",
-     *         description="Success with the stations",
+     *         description="Success with the stations as a paginated resource",
      *         @OA\JsonContent(ref="#/components/schemas/StationResource"),
      *     )
      * )
      *
+     * @param Request $request
      * @return JsonResponse
      * @throws AuthorizationException
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
+        $validated = $request->validate([
+            'long' => 'sometimes|required_with:lat|numeric|min:-90|max:90',
+            'lat' => 'sometimes|required_with:long|min:-180|max:180',
+            'max_distance' => 'sometimes|required_with:lat|required_with:long',
+        ]);
+
         $this->authorize('viewAny', Station::class);
+
+        if (($long = Arr::get($validated, 'long')) &&
+            ($lat = Arr::get($validated, 'lat'))) {
+            $maxDistance = Arr::get($validated, 'max_distance');
+
+            $query = Station::search(
+                callback: static function (Indexes $meilisearch, string $query, array $options) use ($long, $lat, $maxDistance) {
+                    if ($maxDistance) {
+                        $options['filter'] = "_geoRadius($lat, $long, $maxDistance)";
+                    }
+
+                    $options['sort'] = ["_geoPoint($lat,$long):asc"];
+
+                    return $meilisearch->rawSearch(
+                        query: $query,
+                        searchParams: $options,
+                    );
+                },
+            );
+        } else {
+            $query = Station::query();
+        }
+
 
         return $this->jsonSuccess(
             data: StationResource::collection(
-                Station::all(),
+                $query->paginate(self::PER_PAGE),
             ),
         );
     }

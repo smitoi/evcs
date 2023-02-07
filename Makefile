@@ -8,6 +8,7 @@ up:
 	docker-compose exec php-fpm php artisan optimize:clear
 	docker-compose exec php-fpm php artisan key:generate
 	docker-compose exec php-fpm php artisan migrate
+	docker-compose exec php-fpm php artisan scout:sync-index-settings
 	docker-compose exec php-fpm php artisan optimize
 	docker-compose exec php-fpm php artisan l5-swagger:generate
 
