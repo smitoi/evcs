@@ -20,8 +20,11 @@ down:stop
 exec:
 	docker exec -it php-fpm sh
 
+test:
+	docker-compose exec php-fpm php artisan test
+
 swagger:
 	docker-compose exec php-fpm php artisan l5-swagger:generate
 
 optimize:
-	docker-compose exec php-fpm php artisan optimize:clear
+	docker-compose exec php-fpm php artisan optimize

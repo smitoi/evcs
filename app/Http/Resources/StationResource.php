@@ -2,29 +2,34 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Company;
+use App\Models\Station;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 
 /**
- * Class CompanyResource
+ * Class StationResource
  * @package App\Http\Resources
  * @OA\Schema(
  *      @OA\Property(
  *          property="uuid",
- *          description="Identifier of the company",
+ *          description="Identifier of the station",
  *          type="string",
  *      ),
  *      @OA\Property(
  *          property="name",
- *          description="Name of the company",
+ *          description="Name of the station",
+ *          type="string",
+ *      ),
+ *      @OA\Property(
+ *          property="address",
+ *          description="Address of the station",
  *          type="string",
  *      )
  * )
  *
  */
-class CompanyResource extends JsonResource
+class StationResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -34,11 +39,14 @@ class CompanyResource extends JsonResource
      */
     public function toArray($request): array
     {
-        /** @var Company $this */
+        /** @var Station $this */
         return [
             'uuid' => $this->uuid,
             'name' => $this->name,
-            'parent_uuid' => $this->parent?->uuid,
+            'address' => $this->address,
+            'company_uuid' => $this->company->uuid,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
         ];
     }
 }

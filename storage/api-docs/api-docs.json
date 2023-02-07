@@ -195,6 +195,155 @@
                     }
                 ]
             }
+        },
+        "/api/station/": {
+            "get": {
+                "tags": [
+                    "station"
+                ],
+                "summary": "List all stations",
+                "description": "List",
+                "operationId": "stationList",
+                "responses": {
+                    "200": {
+                        "description": "Success with the stations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StationResource"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "station"
+                ],
+                "summary": "Stores a new station",
+                "description": "Store",
+                "operationId": "stationStore",
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/StoreStationRequest"
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success with the new station's data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StationResource"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/station/{id}": {
+            "get": {
+                "tags": [
+                    "station"
+                ],
+                "summary": "Gets the details for a station",
+                "description": "Show",
+                "operationId": "stationShow",
+                "parameters": [
+                    {
+                        "parameter": "id",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success with the selected station",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StationResource"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "station"
+                ],
+                "summary": "Updated an existing station",
+                "description": "Update",
+                "operationId": "stationUpdate",
+                "parameters": [
+                    {
+                        "parameter": "id",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/UpdateStationRequest"
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success with the station's updated data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StationResource"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "station"
+                ],
+                "summary": "Removes a station",
+                "description": "Destroy",
+                "operationId": "stationDelete",
+                "parameters": [
+                    {
+                        "parameter": "id",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Success, empty response"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -207,6 +356,23 @@
                     },
                     "name": {
                         "description": "Name of the company",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "StationResource": {
+                "properties": {
+                    "uuid": {
+                        "description": "Identifier of the station",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "Name of the station",
+                        "type": "string"
+                    },
+                    "address": {
+                        "description": "Address of the station",
                         "type": "string"
                     }
                 },
@@ -251,6 +417,38 @@
                     }
                 }
             },
+            "StoreStationRequest": {
+                "description": "Request to create a new station",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "description": "Name of the station - required, should be unique in the database",
+                                    "type": "string"
+                                },
+                                "address": {
+                                    "description": "Address of the station - required",
+                                    "type": "string"
+                                },
+                                "company_uuid": {
+                                    "description": "UUID of the company for the station - required",
+                                    "type": "string"
+                                },
+                                "latitude": {
+                                    "description": "Latitude on the map - required, should between -90 and 90",
+                                    "type": "string"
+                                },
+                                "longitude": {
+                                    "description": "Latitude on the map - required, should between -90 and 90",
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
             "UpdateCompanyRequest": {
                 "description": "Request to update an existing company",
                 "content": {
@@ -263,6 +461,38 @@
                                 },
                                 "parent_uuid": {
                                     "description": "UUID of the parent for the company - optional",
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "UpdateStationRequest": {
+                "description": "Request to update an existing station",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "description": "Name of the station - required, should be unique in the database",
+                                    "type": "string"
+                                },
+                                "address": {
+                                    "description": "Address of the station - required",
+                                    "type": "string"
+                                },
+                                "company_uuid": {
+                                    "description": "UUID of the company for the station - required",
+                                    "type": "string"
+                                },
+                                "latitude": {
+                                    "description": "Latitude on the map - required, should between -90 and 90",
+                                    "type": "string"
+                                },
+                                "longitude": {
+                                    "description": "Latitude on the map - required, should between -90 and 90",
                                     "type": "string"
                                 }
                             },

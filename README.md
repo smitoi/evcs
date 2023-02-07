@@ -2,14 +2,14 @@
 
 REST API for an electric vehicle charging station management system using Laravel 9. Main requirements:
 
-- [ ] Administrators can manage companies.
-- [ ] Administrators can manage charging stations.
-- [ ] Companies are arranged in a hierarchical structure.
+- [x] Administrators can manage companies.
+- [x] Administrators can manage charging stations.
+- [x] Companies are arranged in a hierarchical structure.
 - [ ] Users can search the nearest stations to their position.
 
 ## Local Development
 
-This project uses Docker - to build and start the containers use:
+This project uses Docker adapted from an Laravel Initializer template - to build and start the containers use:
 
 ```shell
 make build
@@ -18,9 +18,25 @@ make up
 
 Some useful commands can be found inside the Makefile.
 
+### Login:
+
+#### Administrator
+
+- email: admin@virta.global
+- password: secret
+
+#### Customer
+
+- email: customer@virta.global
+- password: secret
+
+email: admin@beecoded.ro
+password: secret
+
 ### Links
 
 - **Your Application** http://localhost
+- **API Documentation** http://localhost/api/documentation/
 - **Preview Emails via Mailpit** http://localhost:8025
 - **MeiliSearch Administration Panel** http://localhost:7700
 - **Laravel Telescope** http://localhost/telescope

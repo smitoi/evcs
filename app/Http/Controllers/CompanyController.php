@@ -6,7 +6,9 @@ use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
 use App\Http\Resources\CompanyResource;
 use App\Models\Company;
+use App\Services\CompanyService;
 use Exception;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -29,9 +31,11 @@ class CompanyController extends ApiController
      * )
      *
      * @return JsonResponse
+     * @throws AuthorizationException
      */
     public function index(): JsonResponse
     {
+        $this->authorize('viewAny', Company::class);
 
         return $this->jsonSuccess(
             data: CompanyResource::collection(
@@ -58,9 +62,12 @@ class CompanyController extends ApiController
      *
      * @param StoreCompanyRequest $request
      * @return JsonResponse
+     * @throws AuthorizationException
      */
     public function store(StoreCompanyRequest $request): JsonResponse
     {
+        $this->authorize('create', Company::class);
+
         try {
             DB::beginTransaction();
             $validated = $request->validated();
@@ -71,7 +78,9 @@ class CompanyController extends ApiController
                 Arr::set($validated, 'parent_id', $parent->id);
             }
 
-            $company = Company::query()->create($request->validated());
+            /** @var Company $company */
+            $company = Company::query()->create($validated);
+            CompanyService::addParentHierarchy($company);
         } catch (Exception $exception) {
             DB::rollBack();
             return $this->jsonError(
@@ -109,9 +118,12 @@ class CompanyController extends ApiController
      *
      * @param Company $company
      * @return JsonResponse
+     * @throws AuthorizationException
      */
     public function show(Company $company): JsonResponse
     {
+        $this->authorize('view', $company);
+
         return $this->jsonSuccess(
             data: CompanyResource::make($company),
         );
@@ -142,9 +154,12 @@ class CompanyController extends ApiController
      * @param Company $company
      * @return JsonResponse
      *
+     * @throws AuthorizationException
      */
     public function update(UpdateCompanyRequest $request, Company $company): JsonResponse
     {
+        $this->authorize('update', $company);
+
         try {
             DB::beginTransaction();
             $validated = $request->validated();
@@ -155,7 +170,8 @@ class CompanyController extends ApiController
                 Arr::set($validated, 'parent_id', $parent->id);
             }
 
-            $company->update($request->validated());
+            $company->update($validated);
+            CompanyService::addParentHierarchy($company);
         } catch (Exception $exception) {
             DB::rollBack();
             return $this->jsonError(
@@ -166,8 +182,7 @@ class CompanyController extends ApiController
         DB::commit();
 
         return $this->jsonSuccess(
-            CompanyResource::make($company),
-            code: 201
+            CompanyResource::make($company)
         );
     }
 
@@ -193,9 +208,12 @@ class CompanyController extends ApiController
      * @param Company $company
      * @return JsonResponse
      *
+     * @throws AuthorizationException
      */
     public function destroy(Company $company): JsonResponse
     {
+        $this->authorize('delete', $company);
+
         $company->delete();
 
         return $this->jsonSuccess(

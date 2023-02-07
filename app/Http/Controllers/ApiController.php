@@ -35,12 +35,12 @@ use Illuminate\Routing\Controller as BaseController;
 class ApiController extends Controller
 {
     /**
-     * @param Arrayable|ArrayAccess|null $data
+     * @param array|Arrayable|ArrayAccess|null $data
      * @param string $message
      * @param int $code
      * @return JsonResponse
      */
-    public function jsonSuccess(Arrayable|ArrayAccess|null $data = null, string $message = 'success', int $code = 200): JsonResponse
+    public function jsonSuccess(array|Arrayable|ArrayAccess|null $data = null, string $message = 'success', int $code = 200): JsonResponse
     {
         return response()->json(
             array_filter([
@@ -53,12 +53,12 @@ class ApiController extends Controller
     }
 
     /**
-     * @param Arrayable|ArrayAccess|null $errors
+     * @param array|Arrayable|ArrayAccess|null $errors
      * @param string $message
      * @param integer $code
      * @return JsonResponse
      */
-    public function jsonError(Arrayable|ArrayAccess|null $errors = null, string $message = 'error', int $code = 500): JsonResponse
+    public function jsonError(array|Arrayable|ArrayAccess|null $errors = null, string $message = 'error', int $code = 500): JsonResponse
     {
         return response()->json(
             array_filter([

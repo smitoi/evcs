@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\StationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,8 +16,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('login', LoginController::class);
+Route::post('login', LoginController::class)->name('login');
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::resource('company', CompanyController::class);
+    Route::apiResource('company', CompanyController::class);
+    Route::apiResource('station', StationController::class);
 });

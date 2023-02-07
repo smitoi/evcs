@@ -2,13 +2,13 @@
 
 namespace App\Policies;
 
-use App\Models\Company;
+use App\Models\Station;
 use App\Policies\Definitions\BasePolicy;
 
-class CompanyPolicy extends BasePolicy
+class StationPolicy extends BasePolicy
 {
     protected function getClassName(): string
     {
-        return Company::class;
+        return Station::class;
     }
 }

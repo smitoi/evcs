@@ -37,6 +37,23 @@ class Company extends Model
         'parent_id',
     ];
 
+    /**
+     * The relationships that should always be loaded.
+     *
+     * @var array
+     */
+    protected $with = ['parent'];
+
+    /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
+
     public function parent(): BelongsTo
     {
         return $this->belongsTo(__CLASS__, 'parent_id', 'id');
@@ -52,8 +69,8 @@ class Company extends Model
         return $this->belongsToMany(
             __CLASS__,
             'companies_hierarchy_levels',
-            'ancestor_id',
             'descendant_id',
+            'ancestor_id',
         )->withPivot('distance');
     }
 
@@ -62,8 +79,8 @@ class Company extends Model
         return $this->belongsToMany(
             __CLASS__,
             'companies_hierarchy_levels',
-            'descendant_id',
             'ancestor_id',
+            'descendant_id',
         )->withPivot('distance');
     }
 }

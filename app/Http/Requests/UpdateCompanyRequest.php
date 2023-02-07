@@ -57,7 +57,7 @@ class UpdateCompanyRequest extends FormRequest
             'name' => [
                 'required',
                 'min:3',
-                Rule::unique('companies', 'name')->ignore($this->route('id'))
+                Rule::unique('companies', 'name')->ignore($this->route('uuid'), 'uuid')
             ],
             'parent_uuid' => 'sometimes|exists:companies,uuid',
         ];
