@@ -41,7 +41,7 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG', false),
+    'debug' => (bool)env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -183,10 +183,13 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
+        \Laravel\Scout\ScoutServiceProvider::class,
 
         /*
          * Package Service Providers...
          */
+
+        Spatie\Permission\PermissionServiceProvider::class,
 
         /*
          * Application Service Providers...

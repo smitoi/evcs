@@ -8,9 +8,9 @@ up:
 	docker-compose exec php-fpm php artisan optimize:clear
 	docker-compose exec php-fpm php artisan key:generate
 	docker-compose exec php-fpm php artisan migrate
+	docker-compose exec php-fpm php artisan scout:sync-index-settings
 	docker-compose exec php-fpm php artisan optimize
 	docker-compose exec php-fpm php artisan l5-swagger:generate
-	docker-compose exec php-fpm npm run dev
 
 stop:
 	docker-compose stop
@@ -21,8 +21,11 @@ down:stop
 exec:
 	docker exec -it php-fpm sh
 
+test:
+	docker-compose exec php-fpm php artisan test
+
 swagger:
 	docker-compose exec php-fpm php artisan l5-swagger:generate
 
 optimize:
-	docker-compose exec php-fpm php artisan optimize:clear
+	docker-compose exec php-fpm php artisan optimize
