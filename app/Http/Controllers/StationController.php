@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreStationRequest;
 use App\Http\Requests\UpdateStationRequest;
+use App\Http\Resources\GroupedStationResource;
 use App\Http\Resources\StationResource;
 use App\Models\Company;
 use App\Models\Station;
@@ -48,13 +49,23 @@ class StationController extends ApiController
      *          )
      *     ),
      *     @OA\Parameter(
-     *        description="Maximum distance of the stations",
+     *        description="Maximum distance of the stations in kilometers",
      *        name="max_distance",
      *        in="query",
      *        required=false,
      *        example="3.14",
      *          @OA\Schema(
      *              type="number",
+     *          )
+     *     ),
+     *     @OA\Parameter(
+     *        description="Company that owns the station - will include 'child' companies",
+     *        name="company_uuid",
+     *        in="query",
+     *        required=false,
+     *        example="valid-uuid-value",
+     *          @OA\Schema(
+     *              type="string",
      *          )
      *     ),
      *     @OA\Response(
@@ -73,14 +84,15 @@ class StationController extends ApiController
         $validated = $request->validate([
             'long' => 'sometimes|required_with:lat|numeric|min:-90|max:90',
             'lat' => 'sometimes|required_with:long|min:-180|max:180',
-            'max_distance' => 'sometimes|required_with:lat|required_with:long',
+            'max_distance' => 'sometimes|required_with:lat|required_with:long|min:0',
+            'company_uuid' => 'sometimes|exists:companies,uuid',
         ]);
 
         $this->authorize('viewAny', Station::class);
 
         if (($long = Arr::get($validated, 'long')) &&
             ($lat = Arr::get($validated, 'lat'))) {
-            $maxDistance = Arr::get($validated, 'max_distance');
+            $maxDistance = Arr::get($validated, 'max_distance') * 1000;
 
             $query = Station::search(
                 callback: static function (Indexes $meilisearch, string $query, array $options) use ($long, $lat, $maxDistance) {
@@ -96,14 +108,27 @@ class StationController extends ApiController
                     );
                 },
             );
+
+            if ($companyId = Arr::get($validated, 'company_uuid')) {
+                /** @var Company $company */
+                $company = Company::where('uuid', $companyId)->with('successors')->first();
+                $query = $query->query(function ($query) use ($company) {
+                    $query->whereIn('company_id', [$company->id, ...$company->successors->pluck('id')]);
+                });
+            }
         } else {
             $query = Station::query();
+
+            if ($companyId = Arr::get($validated, 'company_uuid')) {
+                /** @var Company $company */
+                $company = Company::where('uuid', $companyId)->with('successors')->first();
+                $query = $query->whereIn('company_id', [$company->id, ...$company->successors->pluck('id')]);
+            }
         }
 
-
         return $this->jsonSuccess(
-            data: StationResource::collection(
-                $query->paginate(self::PER_PAGE),
+            data: GroupedStationResource::make(
+                $query->get()->groupBy(['latitude', 'longitude'])->paginate(self::PER_PAGE),
             ),
         );
     }

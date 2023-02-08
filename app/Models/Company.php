@@ -22,7 +22,7 @@ use Illuminate\Support\Collection;
  * @property Collection<Company> $children
  *
  * @property Collection<Company> $ancestors
- * @property Collection<Company> $descendants
+ * @property Collection<Company> $successors
  *
  * @package App\Models
  *
@@ -36,13 +36,6 @@ class Company extends Model
         'name',
         'parent_id',
     ];
-
-    /**
-     * The relationships that should always be loaded.
-     *
-     * @var array
-     */
-    protected $with = ['parent'];
 
     /**
      * Get the route key for the model.
@@ -74,7 +67,7 @@ class Company extends Model
         )->withPivot('distance');
     }
 
-    public function descendants(): BelongsToMany
+    public function successors(): BelongsToMany
     {
         return $this->belongsToMany(
             __CLASS__,

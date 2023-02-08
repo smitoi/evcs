@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
+use App\Http\Resources\CompanyDetailResource;
 use App\Http\Resources\CompanyResource;
 use App\Models\Company;
 use App\Services\CompanyService;
@@ -41,7 +42,7 @@ class CompanyController extends ApiController
 
         return $this->jsonSuccess(
             data: CompanyResource::collection(
-                Company::paginate(self::PER_PAGE),
+                Company::with('parent')->paginate(self::PER_PAGE),
             ),
         );
     }
@@ -126,10 +127,10 @@ class CompanyController extends ApiController
     {
         $this->authorize('view', $company);
 
-        $company->load('ancestors', 'descendants');
+        $company->load('ancestors', 'successors');
 
         return $this->jsonSuccess(
-            data: CompanyResource::make($company),
+            data: CompanyDetailResource::make($company),
         );
     }
 

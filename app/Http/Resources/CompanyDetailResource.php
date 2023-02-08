@@ -24,7 +24,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * )
  *
  */
-class CompanyResource extends JsonResource
+class CompanyDetailResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -42,6 +42,8 @@ class CompanyResource extends JsonResource
                 'name' => $this->parent?->name,
                 'uuid' => $this->parent?->uuid,
             ],
+            'successors' => $this->successors->pluck('name', 'uuid'),
+            'ancestors' => $this->ancestors->pluck('name', 'uuid'),
         ];
     }
 }

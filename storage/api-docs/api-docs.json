@@ -228,12 +228,22 @@
                     {
                         "name": "max_distance",
                         "in": "query",
-                        "description": "Maximum distance of the stations",
+                        "description": "Maximum distance of the stations in kilometers",
                         "required": false,
                         "schema": {
                             "type": "number"
                         },
                         "example": "3.14"
+                    },
+                    {
+                        "name": "company_uuid",
+                        "in": "query",
+                        "description": "Company that owns the station - will include 'child' companies",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "valid-uuid-value"
                     }
                 ],
                 "responses": {
@@ -380,6 +390,19 @@
     },
     "components": {
         "schemas": {
+            "CompanyDetailResource": {
+                "properties": {
+                    "uuid": {
+                        "description": "Identifier of the company",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "Name of the company",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
             "CompanyResource": {
                 "properties": {
                     "uuid": {
