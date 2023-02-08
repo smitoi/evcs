@@ -30,9 +30,6 @@ Some useful commands can be found inside the Makefile.
 - email: customer@virta.global
 - password: secret
 
-email: admin@beecoded.ro
-password: secret
-
 ### Links
 
 - **Your Application** http://localhost
